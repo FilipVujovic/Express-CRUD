@@ -13,7 +13,7 @@ exports.dectyptPassword = async (password, dbPassword) => {
     return passwordsMatch;
 }
 
-exports.signToken = (email) => {
-    const signedJWT = jwt.sign({email}, 'secretKey');
+exports.signToken = (userData) => {
+    const signedJWT = jwt.sign(userData, 'secretKey');
     return signedJWT;
 }
