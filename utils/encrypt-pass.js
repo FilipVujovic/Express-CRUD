@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv')
 const jwt = require('jsonwebtoken');
 dotenv.config();
 
@@ -14,6 +14,6 @@ exports.dectyptPassword = async (password, dbPassword) => {
 }
 
 exports.signToken = (userData) => {
-    const signedJWT = jwt.sign(userData, 'secretKey');
+    const signedJWT = jwt.sign(userData, process.env.SECRETKEY);
     return signedJWT;
 }

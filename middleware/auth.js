@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
 
 exports.authentication = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -7,8 +9,10 @@ exports.authentication = (req, res, next) => {
         message: 'Unauthorized user.'
     });
 
-    jwt.verify(token, 'secretKey', (err, user) => {
-        if (err) return res.sendStatus(403);
+    jwt.verify(token, process.env.SECRETKEY, (err, user) => {
+        if (err) return res.status(403).json({
+            message: 'Error occured when verifying token.'
+        });
         req.user = user;
         next();
     });

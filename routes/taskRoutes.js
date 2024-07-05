@@ -1,19 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const taskService = require("../services/taskService");
-const encryptPass = require('../utils/encrypt-pass');
 const auth = require('../middleware/auth');
+const { taskValidator } = require('../validators/taskValidator')
+const { validationResult } = require('express-validator');
 
-router.post('/', auth.authentication, async (req, res, next) => {
-    try {
-        const postServiceResponse = await taskService.createTask(req.body, req.user);
-        console.log(postServiceResponse);
-        res.status(201).json({
-            rowCount: postServiceResponse.rowCount
+router.post('/', auth.authentication, taskValidator, async (req, res, next) => {
+    const errors = validationResult(req);
+    if(errors.isEmpty()) {
+        try {
+            const postServiceResponse = await taskService.createTask(req.body, req.user);
+            console.log(postServiceResponse);
+            res.status(201).json({
+                rowCount: postServiceResponse.rowCount
+            });
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        res.status(422).json({
+            validationErrors: errors.array()
         });
-    } catch (error) {
-        next(error);
     }
+
 });
 
 router.get('/:id', auth.authentication, async (req, res, next) => {

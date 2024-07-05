@@ -3,12 +3,7 @@ const encryptPass = require("../utils/encrypt-pass");
 const crypto = require("crypto");
 
 exports.createUser = async (email, pass) => {
-  if(!pass.password || !pass.passwordConfirmation) {
-    throw({
-      status: 400,
-      message: 'Password is required.'
-    });
-  } else if(pass.password != pass.passwordConfirmation) {
+if(pass.password != pass.passwordConfirmation) {
     throw({
       status:400,
       message: 'Passwords do not match.'
