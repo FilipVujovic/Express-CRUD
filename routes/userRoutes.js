@@ -68,7 +68,7 @@ const { validationResult } = require('express-validator');
 */
 router.post("/signup", userValidator, async (req, res, next) => {
   const errors = validationResult(req);
-
+  
   if(errors.isEmpty()) {
     try {
       const serviceResponse = await userService.createUser(

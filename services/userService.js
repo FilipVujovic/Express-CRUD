@@ -11,8 +11,8 @@ if(pass.password != pass.passwordConfirmation) {
   };
 
   const encrypredPassword = await encryptPass.encryptPassword(pass.password);
-  const getQuery = `SELECT * from "user" WHERE email='${email}'`;
-  const insertQuery = `INSERT INTO "user"(id, email, password)
+  const getQuery = `SELECT * from "users" WHERE email='${email}'`;
+  const insertQuery = `INSERT INTO "users"(id, email, password)
 	VALUES ('${crypto.randomUUID()}', '${email}', '${encrypredPassword}');`;
 
   const getResult = await db.query(getQuery);
@@ -29,7 +29,7 @@ if(pass.password != pass.passwordConfirmation) {
 };
 
 exports.signIn = async (email, password) => {
-  const getQuery = `SELECT id, password FROM "user" WHERE email='${email}'`;
+  const getQuery = `SELECT id, password FROM "users" WHERE email='${email}'`;
   const getResult = await db.query(getQuery);
 
   if (getResult.rowCount === 0) {
