@@ -42,7 +42,7 @@ exports.signIn = async (email, password) => {
   );
 
   if(!passwordsMatch) {
-    throw ({ status: 404, message: 'Incorrect username or password.' });
+    throw ({ status: 400, message: 'Incorrect username or password.' });
   }
 
   const jwt = encryptPass.signToken({

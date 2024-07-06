@@ -1,5 +1,7 @@
 const db = require("../database");
 const crypto = require("crypto");
+const priorityAllowedValues = ['low', 'medium', 'high'];
+const statusAllowedValues = ['in progress', 'done'];
 
 exports.createTask = async (taskData, userData) => {
   const insertQuery = `INSERT INTO "task"(id, title, description, priority, status, "userId") VALUES ('${crypto.randomUUID()}', '${
@@ -7,6 +9,20 @@ exports.createTask = async (taskData, userData) => {
   }', '${taskData.description}', '${taskData.priority}', '${
     taskData.status
   }', '${userData.id}')`;
+
+  if(!priorityAllowedValues.includes(taskData.priority)) {
+    throw {
+      status: 400,
+      message: `Allowed values for priority are: ${priorityAllowedValues}`,
+    };
+  } 
+
+  if(!statusAllowedValues.includes(taskData.status)) {
+    throw {
+      status: 400,
+      message: `Allowed values for status are: ${statusAllowedValues}`,
+    };
+  }
 
   try {
     const dbResult = await db.query(insertQuery);
@@ -22,7 +38,7 @@ exports.getTaskById = async (taskId, userData) => {
     const getAllResult = await db.query(getAllQuery);
     if (getAllResult.rowCount === 0) {
       throw {
-        status: 400,
+        status: 404,
         message: "This user does not have any tasks.",
       };
     } else if (!getAllResult.rows.find((task) => task.id === taskId)) {
@@ -51,11 +67,25 @@ exports.getAllTasks = async (userData) => {
 exports.updateTask = async (taskData, userData) => {
   const getTask = `SELECT id, title, description, priority, status, "userId" from "task" where id='${taskData.id}'`;
   const updateQuery = `UPDATE "task" SET title='${taskData.title}', description='${taskData.description}', priority='${taskData.priority}', status='${taskData.status}' WHERE id='${taskData.id}';`;
+  if(!priorityAllowedValues.includes(taskData.priority)) {
+    throw {
+      status: 400,
+      message: `Allowed values for priority are: ${priorityAllowedValues}`,
+    };
+  } 
+
+  if(!statusAllowedValues.includes(taskData.status)) {
+    throw {
+      status: 400,
+      message: `Allowed values for status are: ${statusAllowedValues}`,
+    };
+  }
+  
   try {
     const getResut = await db.query(getTask);
     if (getResut.rowCount === 0) {
       throw {
-        status: 400,
+        status: 404,
         message: "This task does not exist.",
       };
     } else if (getResut.rows[0].userId != userData.id) {
@@ -84,7 +114,7 @@ exports.deleteTask = async (taskId, userData) => {
     const getResult = await db.query(getTaskQuery);
     if (getResult.rowCount === 0) {
       throw {
-        status: 400,
+        status: 404,
         message: "This task does not exist.",
       };
     } else if (getResult.rows[0].userId != userData.id) {
