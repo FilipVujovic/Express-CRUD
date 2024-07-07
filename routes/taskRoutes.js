@@ -57,6 +57,16 @@ const { validationResult } = require('express-validator');
  *                 message: 
  *                        type: string
  *                        example: Allowed values for status are done,in progress
+ *       403:
+ *         description: Occurs when verifying token isnt successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                        type: string
+ *                        example: Error occured when verifying token.
  *       500:
  *         description: Server error
  *         content:
@@ -103,15 +113,14 @@ router.post('/', auth.authentication, taskValidator, async (req, res, next) => {
     if(errors.isEmpty()) {
         try {
             const postServiceResponse = await taskService.createTask(req.body, req.user);
-            console.log(postServiceResponse);
-            res.status(201).json({
+            return res.status(201).json({
                 rowCount: postServiceResponse.rowCount
             });
         } catch (error) {
             next(error);
         }
     } else {
-        res.status(422).json({
+        return res.status(422).json({
             validationErrors: errors.array()
         });
     }
@@ -169,6 +178,16 @@ router.post('/', auth.authentication, taskValidator, async (req, res, next) => {
  *                 message: 
  *                        type: string
  *                        example: This user does not have any tasks.
+ *       403:
+ *         description: Occurs when verifying token isnt successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                        type: string
+ *                        example: Error occured when verifying token.
  *       401:
  *         description: Unauthorized request - No token provided/token userId and task userId do not match
  *         content:
@@ -197,9 +216,16 @@ router.post('/', auth.authentication, taskValidator, async (req, res, next) => {
  *                        example: Something went wrong on the server.
 */
 router.get('/:id', auth.authentication, async (req, res, next) => {
+    if(req.params.id === ' ') {
+        return res.status(400).json({
+            status:400,
+            message: 'Task Id is required.'
+        });
+    };
+
     try {
         const getServiceResponse = await taskService.getTaskById(req.params.id, req.user);
-        res.status(200).json(getServiceResponse);
+        return res.status(200).json(getServiceResponse);
     } catch (error) {
         next(error)
     }
@@ -235,6 +261,16 @@ router.get('/:id', auth.authentication, async (req, res, next) => {
  *                      status:
  *                       type: string
  *                       example: done
+ *       403:
+ *         description: Occurs when verifying token isnt successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                        type: string
+ *                        example: Error occured when verifying token.
  *       500:
  *         description: Server error
  *         content:
@@ -252,7 +288,7 @@ router.get('/:id', auth.authentication, async (req, res, next) => {
 router.get('/', auth.authentication, async (req, res, next) => {
     try {
         const getAllServiceResponse = await taskService.getAllTasks(req.user);
-        res.status(200).json(getAllServiceResponse);
+        return res.status(200).json(getAllServiceResponse);
     } catch (error) {
         next(error);
     }
@@ -327,6 +363,16 @@ router.get('/', auth.authentication, async (req, res, next) => {
  *                 message: 
  *                        type: string
  *                        example: Allowed values for status are done,in progress
+ *       403:
+ *         description: Occurs when verifying token isnt successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                        type: string
+ *                        example: Error occured when verifying token.
  *       401:
  *         description: Token not found/You can not update this task
  *         content:
@@ -386,14 +432,14 @@ router.put('/', auth.authentication, taskUpdateValidator, async (req, res, next)
     if(errors.isEmpty()) {
         try {
             const updateServiceResponse = await taskService.updateTask(req.body, req.user);
-            res.status(200).json({
+            return res.status(200).json({
                 rowCount: updateServiceResponse.rowCount
             });
         } catch (error) {
             next(error);
         }
     } else {
-        res.status(422).json({
+        return res.status(422).json({
             validationErrors: errors.array()
         });
     }
@@ -422,6 +468,16 @@ router.put('/', auth.authentication, taskUpdateValidator, async (req, res, next)
  *                 rowCount:
  *                        type: integer
  *                        example: 1
+ *       403:
+ *         description: Occurs when verifying token isnt successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                        type: string
+ *                        example: Error occured when verifying token.
  *       404:
  *         description: User does not have any tasks
  *         content:
@@ -463,9 +519,14 @@ router.put('/', auth.authentication, taskUpdateValidator, async (req, res, next)
  *                        example: Something went wrong on the server.
 */
 router.delete('/:id', auth.authentication, async (req, res, next) => {
+    if(req.params.id === ' ') {
+        return res.status(400).json({
+            message: 'oops'
+        })
+    }
     try {
         const deleteServiceResponse = await taskService.deleteTask(req.params.id, req.user);
-        res.status(200).json({
+        return res.status(200).json({
             rowCount: deleteServiceResponse.rowCount
         });
     } catch (error) {
